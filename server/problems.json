@@ -1,0 +1,115 @@
+[
+  {
+    "title": "Two Sum",
+    "slug": "two-sum",
+    "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+    "difficulty": "easy",
+    "topics": ["arrays", "hashmap"],
+    "constraints": [
+      "2 <= nums.length <= 10^4",
+      "-10^9 <= nums[i] <= 10^9",
+      "-10^9 <= target <= 10^9",
+      "Only one valid answer exists."
+    ],
+    "examples": [
+      {"input": "nums = [2,7,11,15], target = 9", "output": "[0,1]", "explanation": "nums[0] + nums[1] == 9"}
+    ],
+    "testCases": [],
+    "solutionTemplate": {
+      "javascript": "function twoSum(nums, target) {\n  // Your code here\n}",
+      "python": "def two_sum(nums, target):\n    # Your code here",
+      "java": "public int[] twoSum(int[] nums, int target) {\n    // Your code here\n}",
+      "cpp": "vector<int> twoSum(vector<int>& nums, int target) {\n    // Your code here\n}"
+    },
+    "aiContent": {},
+    "stats": {"totalSubmissions": 0, "acceptedSubmissions": 0, "acceptanceRate": 0, "averageTimeToSolve": 0, "difficultyRating": 0, "ratingCount": 0},
+    "source": "DSA Genie",
+    "isPremium": false,
+    "isActive": true,
+    "tags": ["array", "hashmap"],
+    "prerequisites": [],
+    "nextProblems": [],
+    "difficulty": "Easy",
+    "tags": ["Array", "Hash Table"]
+  },
+  {
+    "title": "Reverse Linked List",
+    "slug": "reverse-linked-list",
+    "description": "Given the head of a singly linked list, reverse the list, and return the reversed list.",
+    "difficulty": "easy",
+    "topics": ["linked-lists"],
+    "constraints": [
+      "The number of nodes in the list is the range [0, 5000]",
+      "-5000 <= Node.val <= 5000"
+    ],
+    "examples": [
+      {"input": "head = [1,2,3,4,5]", "output": "[5,4,3,2,1]", "explanation": "Reversed list."}
+    ],
+    "testCases": [],
+    "solutionTemplate": {
+      "javascript": "function reverseList(head) {\n  // Your code here\n}",
+      "python": "def reverse_list(head):\n    # Your code here",
+      "java": "public ListNode reverseList(ListNode head) {\n    // Your code here\n}",
+      "cpp": "ListNode* reverseList(ListNode* head) {\n    // Your code here\n}"
+    },
+    "aiContent": {},
+    "stats": {"totalSubmissions": 0, "acceptedSubmissions": 0, "acceptanceRate": 0, "averageTimeToSolve": 0, "difficultyRating": 0, "ratingCount": 0},
+    "source": "DSA Genie",
+    "isPremium": false,
+    "isActive": true,
+    "tags": ["linked-list"],
+    "prerequisites": [],
+    "nextProblems": [],
+    "difficulty": "Easy",
+    "tags": ["Linked List"]
+  },
+  {
+    "title": "Valid Parentheses",
+    "slug": "valid-parentheses",
+    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.",
+    "difficulty": "easy",
+    "topics": ["stack", "strings"],
+    "constraints": [
+      "1 <= s.length <= 10^4",
+      "s consists of parentheses only"
+    ],
+    "examples": [
+      {"input": "s = '()[]{}'", "output": "true", "explanation": "All brackets are closed correctly."}
+    ],
+    "testCases": [],
+    "solutionTemplate": {
+      "javascript": "function isValid(s) {\n  // Your code here\n}",
+      "python": "def is_valid(s):\n    # Your code here",
+      "java": "public boolean isValid(String s) {\n    // Your code here\n}",
+      "cpp": "bool isValid(string s) {\n    // Your code here\n}"
+    },
+    "aiContent": {},
+    "stats": {"totalSubmissions": 0, "acceptedSubmissions": 0, "acceptanceRate": 0, "averageTimeToSolve": 0, "difficultyRating": 0, "ratingCount": 0},
+    "source": "DSA Genie",
+    "isPremium": false,
+    "isActive": true,
+    "tags": ["stack", "string"],
+    "prerequisites": [],
+    "nextProblems": [],
+    "difficulty": "Easy",
+    "tags": ["Stack"]
+  },
+  {
+    "title": "Add Two Numbers",
+    "slug": "add-two-numbers",
+    "difficulty": "Medium",
+    "tags": ["Linked List", "Math", "Recursion"]
+  },
+  {
+    "title": "Longest Substring Without Repeating Characters",
+    "slug": "longest-substring-without-repeating-characters",
+    "difficulty": "Medium",
+    "tags": ["Hash Table", "String", "Sliding Window"]
+  },
+  {
+    "title": "Median of Two Sorted Arrays",
+    "slug": "median-of-two-sorted-arrays",
+    "difficulty": "Hard",
+    "tags": ["Array", "Binary Search", "Divide and Conquer"]
+  }
+] 
