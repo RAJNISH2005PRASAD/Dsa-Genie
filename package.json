@@ -9,7 +9,10 @@
     "client": "cd client && npm start",
     "build": "cd client && npm run build",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "start": "cd server && npm start"
+    "start": "cd server && npm start",
+    "deploy-setup": "node deploy-setup.js",
+    "deploy:backend": "echo 'Deploy backend to Render: https://render.com'",
+    "deploy:frontend": "echo 'Deploy frontend to Vercel: https://vercel.com'"
   },
   "keywords": ["dsa", "ai", "learning", "gamification", "leetcode", "algorithms"],
   "author": "DSA Genie Team",
