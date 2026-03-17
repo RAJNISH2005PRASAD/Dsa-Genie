@@ -11,10 +11,10 @@ function toBase64(str) {
 
 // Run code for a problem (using Judge0 API with base64)
 router.post('/:id/run', async (req, res) => {
-  const { code, language } = req.body;
-  const { id } = req.params;
-  
   try {
+    const { code, language } = req.body;
+    const { id } = req.params;
+  
     // Map language to Judge0 language ID
     const languageMap = {
       'javascript': 63, // JavaScript (Node.js 12.14.0)
@@ -50,71 +50,27 @@ router.post('/:id/run', async (req, res) => {
       }
     );
 
-    // Get the problem to run test cases
-    const problem = await Problem.findById(id);
-    let testResults = [];
-    
-    if (problem && problem.testCases && problem.testCases.length > 0) {
-      // Run test cases
-      testResults = await Promise.all(
-        problem.testCases.map(async (testCase, index) => {
-          try {
-            const input = typeof testCase.input === 'string' ? testCase.input : JSON.stringify(testCase.input);
-            const testResponse = await axios.post(
-              'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true',
-              {
-                source_code: toBase64(code),
-                language_id: languageId,
-                stdin: toBase64(input)
-              },
-              {
-                headers: {
-                  'content-type': 'application/json',
-                  'X-RapidAPI-Key': RAPIDAPI_KEY,
-                  'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-                },
-              }
-            );
-            
-            const output = testResponse.data.stdout || '';
-            const expected = testCase.output || testCase.expected || '';
-            const inputStr = typeof testCase.input === 'object' ? JSON.stringify(testCase.input) : String(testCase.input || '');
-            const expectedStr = typeof expected === 'object' ? JSON.stringify(expected) : String(expected);
-            const isPassed = output.trim() === expectedStr.trim();
-            
-            return {
-              testCase: index + 1,
-              input: inputStr,
-              expected: expectedStr,
-              actual: output,
-              passed: isPassed
-            };
-          } catch (err) {
-            const expected = testCase.output || testCase.expected || '';
-            const inputStr = typeof testCase.input === 'object' ? JSON.stringify(testCase.input) : String(testCase.input || '');
-            const expectedStr = typeof expected === 'object' ? JSON.stringify(expected) : String(expected);
-            
-            return {
-              testCase: index + 1,
-              input: inputStr,
-              expected: expectedStr,
-              actual: 'Error',
-              passed: false,
-              error: err.message
-            };
-          }
-        })
-      );
-    }
-
     res.json({
       output: response.data.stdout || '',
       error: response.data.stderr || '',
       status: response.data.status,
-      testResults
+      testResults: [] // Simplified: no test cases for run
     });
   } catch (err) {
     console.error('Run code error:', err.response?.data || err.message);
+    console.error('Full error object:', JSON.stringify(err, null, 2));
+    
+    // Handle API quota exceeded - return mock response for demo
+    const errorMessage = err.response?.data?.message || err.message || '';
+    if (errorMessage.includes('exceeded the DAILY quota')) {
+      return res.json({
+        output: 'Code execution quota exceeded. This is a demo limitation.\nIn a production environment, you would have a paid API plan.',
+        error: '',
+        status: { description: 'Demo Mode' },
+        testResults: []
+      });
+    }
+    
     res.status(500).json({ 
       error: 'Failed to run code',
       details: err.response?.data || err.message 

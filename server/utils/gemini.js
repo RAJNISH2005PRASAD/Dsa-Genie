@@ -1,70 +1,39 @@
-const axios = require('axios');
+const OpenAI = require('openai');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 async function geminiChat(prompt, maxRetries = 3) {
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not configured. Please set it in your .env file.');
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is not configured. Please set it in your .env file.');
   }
-
-  const data = {
-    contents: [{
-      parts: [{
-        text: prompt
-      }]
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      topK: 40,
-      topP: 0.95,
-      maxOutputTokens: 2048,
-    },
-    safetySettings: [
-      {
-        category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-      },
-      {
-        category: "HARM_CATEGORY_HATE_SPEECH",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-      },
-      {
-        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-      },
-      {
-        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-      }
-    ]
-  };
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Attempting Gemini API call (attempt ${attempt}/${maxRetries})`);
-      
-      const response = await axios.post(GEMINI_URL, data, {
-        timeout: 30000, // 30 second timeout
-        headers: {
-          'Content-Type': 'application/json',
-        }
+      console.log(`Attempting OpenAI API call (attempt ${attempt}/${maxRetries})`);
+
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 2048,
+        temperature: 0.7,
       });
 
-      if (response.data && response.data.candidates && response.data.candidates[0]) {
-        const text = response.data.candidates[0].content.parts[0].text;
-        console.log('Gemini API call successful');
+      if (response.choices && response.choices[0]) {
+        const text = response.choices[0].message.content;
+        console.log('OpenAI API call successful');
         return text;
       } else {
-        throw new Error('Invalid response structure from Gemini API');
+        throw new Error('Invalid response structure from OpenAI API');
       }
     } catch (error) {
-      console.error(`Gemini API attempt ${attempt} failed:`, error.message);
-      
+      console.error(`OpenAI API attempt ${attempt} failed:`, error.message);
+
       if (attempt === maxRetries) {
-        throw new Error(`Gemini API failed after ${maxRetries} attempts: ${error.message}`);
+        throw new Error(`OpenAI API failed after ${maxRetries} attempts: ${error.message}`);
       }
-      
+
       // Wait before retrying (exponential backoff)
       const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
       await new Promise(resolve => setTimeout(resolve, waitTime));

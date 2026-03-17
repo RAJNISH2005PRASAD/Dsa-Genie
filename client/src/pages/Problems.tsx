@@ -128,9 +128,9 @@ const Problems: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex space-x-1">
-                      {problem.topics.slice(0, 2).map((topic) => (
+                      {problem.topics.slice(0, 2).map((topic, index) => (
                         <span
-                          key={topic}
+                          key={`${topic}-${index}`}
                           className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-dark-600 text-dark-300"
                         >
                           {topic}

@@ -35,8 +35,10 @@ router.post('/register', [
     .withMessage('Password must contain at least one number')
 ], async (req, res) => {
   try {
+    console.log('Register request body:', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 

@@ -1,0 +1,28 @@
+{
+  "name": "dsa-genie-tests",
+  "version": "1.0.0",
+  "description": "End-to-end test automation for DSA Genie platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha e2e/tests/**/*.test.js --timeout 60000",
+    "test:smoke": "mocha e2e/tests/smoke.test.js --timeout 30000",
+    "test:regression": "mocha e2e/tests/regression/*.test.js --timeout 60000",
+    "test:parallel": "mocha e2e/tests/**/*.test.js --timeout 60000 --parallel",
+    "test:ci": "mocha e2e/tests/**/*.test.js --timeout 60000 --reporter mochawesome",
+    "jira:upload": "node scripts/upload-to-jira.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.15.0",
+    "chromedriver": "^119.0.1",
+    "jira-client": "^8.2.2",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
+    "mochawesome": "^7.1.3",
+    "eslint": "^8.55.0"
+  }
+}

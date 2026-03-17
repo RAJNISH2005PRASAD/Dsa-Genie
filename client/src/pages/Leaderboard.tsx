@@ -18,7 +18,7 @@ const Leaderboard: React.FC = () => {
     const fetchLeaderboard = async () => {
       setLoading(true);
       try {
-        const res = await api.get('/users/leaderboard');
+        const res = await api.get('/auth/leaderboard');
         setUsers(res.data.users || []);
       } catch (err) {
         setUsers([]);

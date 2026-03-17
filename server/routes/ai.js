@@ -24,18 +24,21 @@ router.get('/recommendations', auth, async (req, res) => {
     const problems = await Problem.find(query)
       .select('title slug difficulty topics stats aiContent')
       .limit(parseInt(limit) * 2);
-    // Use Gemini to score and recommend
-    const recommendations = await Promise.all(
-      problems.map(async (problem) => {
-        const prompt = `Given a user with level ${user.level}, solved ${userStats.totalSolved} problems, and a problem titled "${problem.title}" (difficulty: ${problem.difficulty}, topics: ${problem.topics.join(', ')}), rate the suitability of this problem for the user on a scale of 0-100. Return only the number.`;
-        let score = 50;
-        try {
-          const geminiResp = await geminiChat(prompt);
-          score = parseInt(geminiResp.match(/\d+/)?.[0] || '50');
-        } catch {}
-        return { problem, score };
-      })
-    );
+    // Use simple scoring instead of AI
+    const recommendations = problems.map((problem) => {
+      let score = 50;
+      // Simple scoring based on user level and problem difficulty
+      const difficultyScore = {
+        'easy': 30,
+        'medium': 50,
+        'hard': 70
+      };
+      const problemScore = difficultyScore[problem.difficulty] || 50;
+      const levelDiff = Math.abs(user.level - problemScore / 10);
+      score = Math.max(10, 100 - levelDiff * 10);
+      
+      return { problem, score };
+    });
     recommendations.sort((a, b) => b.score - a.score);
     const topRecommendations = recommendations
       .slice(0, parseInt(limit))
@@ -132,7 +135,13 @@ router.post('/analyze-solution', auth, async (req, res) => {
     const problem = await Problem.findById(problemId);
     if (!problem) return res.status(404).json({ error: 'Problem not found' });
     const prompt = `Analyze this coding solution:\nProblem: ${problem.title}\nLanguage: ${language}\nSolution: ${solution}\nProvide analysis on correctness, edge cases, time/space complexity, code quality, improvements, and best practices.`;
-    const analysis = await geminiChat(prompt);
+    let analysis = 'Analysis not available at the moment.';
+    try {
+      const aiResponse = await geminiChat(prompt);
+      analysis = typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse);
+    } catch (aiError) {
+      console.error('AI analysis failed:', aiError.message);
+    }
     res.json({ analysis, problem: { title: problem.title, difficulty: problem.difficulty } });
   } catch (error) {
     console.error('AI solution analysis error:', error);

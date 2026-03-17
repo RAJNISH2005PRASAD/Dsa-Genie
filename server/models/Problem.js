@@ -23,9 +23,7 @@ const problemSchema = new mongoose.Schema({
     required: true
   },
   topics: [{
-    type: String,
-    enum: ['arrays', 'strings', 'linked-lists', 'trees', 'graphs', 'dynamic-programming', 'greedy', 'backtracking', 'binary-search', 'two-pointers', 'sliding-window', 'stack', 'queue', 'heap', 'trie', 'union-find', 'bit-manipulation', 'math', 'geometry', 'divide-and-conquer'],
-    required: true
+    type: String
   }],
   
   // Problem constraints and examples

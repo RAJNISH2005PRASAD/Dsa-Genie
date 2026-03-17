@@ -12,6 +12,7 @@ const Register: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const { register, isLoading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
@@ -19,8 +20,10 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    setLocalError(null);
 
     if (formData.password !== formData.confirmPassword) {
+      setLocalError('Passwords do not match');
       return;
     }
 
@@ -48,9 +51,9 @@ const Register: React.FC = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+          {(error || localError) && (
             <div className="bg-error-900/20 border border-error-500/30 text-error-400 px-4 py-3 rounded-lg">
-              {error}
+              {error || localError}
             </div>
           )}
 

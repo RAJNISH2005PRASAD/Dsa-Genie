@@ -17,7 +17,7 @@ interface Problem {
   }>;
   testCases: Array<{
     input: string;
-    expected: string;
+    output: string;
   }>;
 }
 
