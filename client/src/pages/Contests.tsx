@@ -91,10 +91,10 @@ const Contests: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="contests-list space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Contests</h1>
+        <h1 className="text-3xl font-bold gradient-text">Contests</h1>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -110,7 +110,7 @@ const Contests: React.FC = () => {
       {/* Contests Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredContests.map((contest) => (
-          <div key={contest._id} className="card-hover p-6">
+          <div key={contest._id} className="card-hover tilt-hover p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-white mb-2">

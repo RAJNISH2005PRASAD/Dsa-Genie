@@ -26,6 +26,14 @@ const Register: React.FC = () => {
       setLocalError('Passwords do not match');
       return;
     }
+    if (formData.password.length < 6) {
+      setLocalError('Password must be at least 6 characters long');
+      return;
+    }
+    if (!/\d/.test(formData.password)) {
+      setLocalError('Password must contain at least one number');
+      return;
+    }
 
     try {
       await register(formData.username, formData.email, formData.password);
@@ -50,9 +58,9 @@ const Register: React.FC = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="register-form mt-8 space-y-6" onSubmit={handleSubmit}>
           {(error || localError) && (
-            <div className="bg-error-900/20 border border-error-500/30 text-error-400 px-4 py-3 rounded-lg">
+            <div className="error-message bg-error-900/20 border border-error-500/30 text-error-400 px-4 py-3 rounded-lg">
               {error || localError}
             </div>
           )}

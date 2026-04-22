@@ -4,13 +4,13 @@ import { SparklesIcon, CodeBracketIcon, TrophyIcon, ChartBarIcon } from '@heroic
 
 const Home: React.FC = () => {
   return (
-    <div className="space-y-12">
+    <div className="home-content space-y-12">
       {/* Hero Section */}
-      <div className="text-center py-16">
+      <div className="text-center py-16 tilt-hover">
         <div className="flex justify-center mb-6">
           <SparklesIcon className="h-16 w-16 text-primary-500" />
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-[0_10px_30px_rgba(59,130,246,0.28)]">
           Master DSA with
           <span className="gradient-text"> AI-Powered</span> Learning
         </h1>
@@ -30,7 +30,7 @@ const Home: React.FC = () => {
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="card p-6 text-center">
+        <div className="card-hover p-6 text-center tilt-hover">
           <CodeBracketIcon className="h-12 w-12 text-primary-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Smart Problems</h3>
           <p className="text-dark-300">
@@ -38,7 +38,7 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        <div className="card p-6 text-center">
+        <div className="card-hover p-6 text-center tilt-hover">
           <SparklesIcon className="h-12 w-12 text-primary-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">AI Assistant</h3>
           <p className="text-dark-300">
@@ -46,7 +46,7 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        <div className="card p-6 text-center">
+        <div className="card-hover p-6 text-center tilt-hover">
           <TrophyIcon className="h-12 w-12 text-primary-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Contests</h3>
           <p className="text-dark-300">
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
           </p>
         </div>
 
-        <div className="card p-6 text-center">
+        <div className="card-hover p-6 text-center tilt-hover">
           <ChartBarIcon className="h-12 w-12 text-primary-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Progress Tracking</h3>
           <p className="text-dark-300">

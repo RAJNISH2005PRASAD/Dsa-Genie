@@ -1,0 +1,100 @@
+---
+# DSA Genie - Ansible Playbook
+# Deploys application using Docker or Kubernetes
+# Usage:
+#   ansible-playbook -i inventory.yml playbook.yml
+#   ansible-playbook -i inventory.yml playbook.yml -e "deploy_target=docker"
+#   ansible-playbook -i inventory.yml playbook.yml -e "deploy_target=kubernetes"
+
+- name: Deploy DSA Genie Application
+  hosts: dsa_genie_servers
+  become: yes
+  vars:
+    deploy_target: "{{ deploy_method | default('docker') }}"
+    app_name: dsa-genie
+    project_dir: /opt/dsa-genie
+
+  tasks:
+    - name: Ensure required packages are installed
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - git
+          - curl
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure Docker is started
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create application directory
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Clone or update repository
+      git:
+        repo: "{{ git_repo | default('https://github.com/your-org/dsa-genie.git') }}"
+        dest: "{{ project_dir }}"
+        version: "{{ git_branch | default('main') }}"
+        force: yes
+      when: git_repo is defined
+
+    - name: Create .env file for Docker
+      template:
+        src: templates/env.j2
+        dest: "{{ project_dir }}/.env"
+        mode: '0600'
+      when: deploy_target == 'docker'
+
+    - name: Deploy with Docker Compose
+      command: docker-compose up -d
+      args:
+        chdir: "{{ project_dir }}"
+        creates: "{{ project_dir }}/.deployed"
+      when: deploy_target == 'docker'
+      register: docker_up
+      failed_when: docker_up.rc != 0
+
+    - name: Create .deployed marker
+      file:
+        path: "{{ project_dir }}/.deployed"
+        state: touch
+      when: deploy_target == 'docker' and docker_up is changed
+
+    - name: Ensure kubectl is installed (for K8s)
+      block:
+        - apt:
+            name: kubectl
+            state: present
+          when: ansible_os_family == "Debian"
+        - stat:
+            path: "{{ kube_config_path | default('~/.kube/config') }}"
+          register: kubeconfig
+      when: deploy_target == 'kubernetes'
+
+    - name: Deploy to Kubernetes with kubectl
+      command: "kubectl apply -f {{ playbook_dir }}/../k8s/ -n {{ k8s_namespace | default('dsa-genie') }}"
+      when: deploy_target == 'kubernetes'
+
+    - name: Verify API health
+      uri:
+        url: "http://localhost:5000/api/health"
+        status_code: 200
+        timeout: 5
+      register: health_check
+      retries: 5
+      delay: 10
+      until: health_check.status == 200
+      when: deploy_target == 'docker'
+
+    - name: Health check passed
+      debug:
+        msg: "DSA Genie deployed successfully! API is healthy."
+      when: health_check is succeeded

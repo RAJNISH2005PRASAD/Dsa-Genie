@@ -1,0 +1,35 @@
+# Ansible Inventory - DSA Genie
+# Usage: ansible-playbook -i inventory.yml playbook.yml
+
+all:
+  children:
+    dsa_genie_servers:
+      hosts:
+        dsa_genie_prod:
+          ansible_host: 192.168.1.100
+          ansible_user: ubuntu
+          docker_registry: localhost:5000
+      vars:
+        app_name: dsa-genie
+        k8s_namespace: dsa-genie
+
+    # For local Docker deployment
+    docker_hosts:
+      hosts:
+        localhost:
+          ansible_connection: local
+      vars:
+        deploy_method: docker
+
+    # For Kubernetes deployment
+    k8s_hosts:
+      hosts:
+        k8s_master:
+          ansible_host: 192.168.1.101
+          ansible_user: ubuntu
+      vars:
+        deploy_method: kubernetes
+        kube_config_path: ~/.kube/config
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

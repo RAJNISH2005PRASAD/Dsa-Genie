@@ -8,26 +8,26 @@ interface User {
   email: string;
   role: string;
   avatar?: string;
-  coins: number;
-  level: number;
-  experience: number;
-  streak: {
+  coins?: number;
+  level?: number;
+  experience?: number;
+  streak?: {
     current: number;
     longest: number;
-    lastSolvedDate: string | null;
+    lastSolvedDate?: string | null;
   };
-  stats: {
+  stats?: {
     totalSolved: number;
     easySolved: number;
     mediumSolved: number;
     hardSolved: number;
-    accuracy: number;
+    accuracy?: number;
   };
-  preferences: {
+  preferences?: {
     difficulty: string;
     topics: string[];
     dailyGoal: number;
-    notifications: {
+    notifications?: {
       email: boolean;
       push: boolean;
     };
@@ -131,10 +131,4 @@ export const useAuthStore = create<AuthState>()(
       }),
     }
   )
-);
-
-// Initialize axios interceptor for token
-const token = useAuthStore.getState().token;
-if (token) {
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-} 
+); 

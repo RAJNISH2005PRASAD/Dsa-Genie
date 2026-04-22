@@ -76,7 +76,23 @@ const Dashboard: React.FC = () => {
     const fetchDashboardData = async () => {
       try {
         const res = await api.get('/auth/me');
-        setStats(res.data.user);
+        const u = res.data.user;
+        setStats({
+          totalSolved: u.stats?.totalSolved ?? 0,
+          easySolved: u.stats?.easySolved ?? 0,
+          mediumSolved: u.stats?.mediumSolved ?? 0,
+          hardSolved: u.stats?.hardSolved ?? 0,
+          streak: u.streak ?? { current: 0, longest: 0, lastSolvedDate: null },
+          level: u.level ?? 1,
+          experience: u.experience ?? 0,
+          coins: u.coins ?? 0,
+          recentProblems: (u.solvedProblems || []).slice(0, 5).map((sp: any) => ({
+            title: sp.problemId?.title ?? 'Unknown',
+            slug: sp.problemId?.slug ?? sp.problemId ?? '',
+            difficulty: sp.difficulty ?? 'medium',
+            solvedAt: sp.solvedAt
+          }))
+        });
       } catch (err) {
         console.error('Failed to fetch dashboard data');
       } finally {
@@ -100,7 +116,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="dashboard space-y-6">
       {/* Welcome Section */}
       <div className="card p-6">
         <h1 className="text-2xl font-bold text-white mb-2">

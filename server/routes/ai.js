@@ -7,6 +7,81 @@ const { geminiChat, geminiGenerateJSON } = require('../utils/gemini');
 
 const router = express.Router();
 
+function buildFallbackProblem(topic = 'arrays', difficulty = 'easy', description = '') {
+  const normalizedTopic = String(topic).toLowerCase().trim();
+  const normalizedDifficulty = ['easy', 'medium', 'hard'].includes(String(difficulty).toLowerCase())
+    ? String(difficulty).toLowerCase()
+    : 'easy';
+  const desc = String(description || '').toLowerCase();
+
+  // Special fallback for the most common request users try first.
+  if (normalizedTopic === 'arrays' && desc.includes('two sum')) {
+    return {
+      title: 'Pair Sum Target Finder',
+      description:
+        'Given an integer array nums and an integer target, return the indices of two numbers such that they add up to target. You may assume exactly one valid answer exists, and you may not use the same element twice. Return the indices in any order.',
+      difficulty: 'easy',
+      topics: ['arrays', 'two-pointers', 'hashing'],
+      constraints: [
+        '2 <= nums.length <= 10^5',
+        '-10^9 <= nums[i] <= 10^9',
+        '-10^9 <= target <= 10^9',
+        'Exactly one valid answer exists'
+      ],
+      examples: [
+        {
+          input: 'nums = [2,7,11,15], target = 9',
+          output: '[0,1]',
+          explanation: 'nums[0] + nums[1] = 2 + 7 = 9'
+        },
+        {
+          input: 'nums = [3,2,4], target = 6',
+          output: '[1,2]',
+          explanation: 'nums[1] + nums[2] = 2 + 4 = 6'
+        }
+      ],
+      testCases: [
+        { input: '2 7 11 15\n9', output: '0 1', isHidden: false },
+        { input: '3 2 4\n6', output: '1 2', isHidden: false },
+        { input: '-1 -2 -3 -4 -5\n-8', output: '2 4', isHidden: true }
+      ],
+      solutionTemplate: {
+        javascript:
+          'function solve(nums, target) {\n  const seen = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const need = target - nums[i];\n    if (seen.has(need)) return [seen.get(need), i];\n    seen.set(nums[i], i);\n  }\n  return [];\n}',
+        python:
+          'def solve(nums, target):\n    seen = {}\n    for i, n in enumerate(nums):\n      need = target - n\n      if need in seen:\n        return [seen[need], i]\n      seen[n] = i\n    return []',
+        java:
+          'public int[] solve(int[] nums, int target) {\n  Map<Integer, Integer> seen = new HashMap<>();\n  for (int i = 0; i < nums.length; i++) {\n    int need = target - nums[i];\n    if (seen.containsKey(need)) return new int[]{seen.get(need), i};\n    seen.put(nums[i], i);\n  }\n  return new int[]{};\n}',
+        cpp:
+          'vector<int> solve(vector<int>& nums, int target) {\n  unordered_map<int, int> seen;\n  for (int i = 0; i < (int)nums.size(); i++) {\n    int need = target - nums[i];\n    if (seen.count(need)) return {seen[need], i};\n    seen[nums[i]] = i;\n  }\n  return {};\n}'
+      }
+    };
+  }
+
+  return {
+    title: `${normalizedDifficulty[0].toUpperCase()}${normalizedDifficulty.slice(1)} ${normalizedTopic[0].toUpperCase()}${normalizedTopic.slice(1)} Challenge`,
+    description:
+      `Solve a ${normalizedDifficulty} level problem focused on ${normalizedTopic}. ${description ? `Context: ${description}` : ''}`.trim(),
+    difficulty: normalizedDifficulty,
+    topics: [normalizedTopic],
+    constraints: ['Input size is within practical competitive programming limits'],
+    examples: [
+      {
+        input: 'See problem statement',
+        output: 'Valid output based on rules',
+        explanation: 'Apply the intended algorithmic approach.'
+      }
+    ],
+    testCases: [{ input: 'sample-input', output: 'sample-output', isHidden: false }],
+    solutionTemplate: {
+      javascript: 'function solve(input) {\n  // Your code here\n}',
+      python: 'def solve(input):\n    # Your code here',
+      java: 'public class Solution {\n    public static String solve(String input) {\n        // Your code here\n    }\n}',
+      cpp: 'string solve(string input) {\n    // Your code here\n}'
+    }
+  };
+}
+
 // @route   GET /api/ai/recommendations
 // @desc    Get AI-powered problem recommendations
 // @access  Private
@@ -19,7 +94,9 @@ router.get('/recommendations', auth, async (req, res) => {
     const userStats = user.getProgress();
     const query = { isActive: true };
     if (difficulty && difficulty !== 'mixed') query.difficulty = difficulty;
-    if (topics && topics.length > 0) query.topics = { $in: topics.split(',') };
+    if (typeof topics === 'string' && topics.trim().length > 0) {
+      query.topics = { $in: topics.split(',').map((topic) => topic.trim()).filter(Boolean) };
+    }
     if (solvedProblemIds.length > 0) query._id = { $nin: solvedProblemIds };
     const problems = await Problem.find(query)
       .select('title slug difficulty topics stats aiContent')
@@ -55,7 +132,7 @@ router.get('/recommendations', auth, async (req, res) => {
 });
 
 // @route   POST /api/ai/chat
-// @desc    Send a message to AI assistant
+// @desc    Send a message to AI assistant (DSA only)
 // @access  Private
 router.post('/chat', auth, async (req, res) => {
   try {
@@ -63,9 +140,53 @@ router.post('/chat', auth, async (req, res) => {
     if (!message || message.trim().length === 0) {
       return res.status(400).json({ error: 'Message is required' });
     }
-    const prompt = `You are DSA Genie, an AI assistant for Data Structures and Algorithms. User message: ${message}\nProvide a helpful, educational response.`;
-    const aiResponse = await geminiChat(prompt);
-    res.json({ reply: aiResponse });
+
+    // DSA Topics for validation
+    const dsaTopics = [
+      'arrays', 'strings', 'linked lists', 'trees', 'binary trees', 'bst', 'graphs', 
+      'dynamic programming', 'greedy', 'backtracking', 'binary search', 'two pointers',
+      'sliding window', 'stack', 'queue', 'heap', 'priority queue', 'trie', 'union find',
+      'bit manipulation', 'math', 'geometry', 'recursion', 'sorting', 'hashing',
+      'time complexity', 'space complexity', 'big o', 'algorithm', 'data structure',
+      'dfs', 'bfs', 'dp', 'leetcode', 'coding interview', 'problem solving'
+    ];
+
+    // Check if message contains DSA-related keywords
+    const messageLower = message.toLowerCase();
+    const isDSARelated = dsaTopics.some(topic => messageLower.includes(topic)) || 
+                        messageLower.includes('how to') || 
+                        messageLower.includes('solve') ||
+                        messageLower.includes('explain') ||
+                        messageLower.includes('approach') ||
+                        messageLower.includes('algorithm') ||
+                        messageLower.includes('code');
+
+    const systemPrompt = `You are DSA Genie, an expert AI assistant specialized ONLY in Data Structures and Algorithms (DSA) topics.
+
+STRICT RULES - FOLLOW THESE EXACTLY:
+1. ONLY answer questions about DSA topics: arrays, strings, linked lists, trees, graphs, dynamic programming, greedy algorithms, backtracking, sorting, binary search, bit manipulation, complexity analysis, etc.
+2. If the user asks about ANYTHING OTHER than DSA (sports, weather, politics, history, general programming unrelated to DSA, etc.), IMMEDIATELY respond with:
+   "I'm DSA Genie, specialized only in Data Structures and Algorithms. I can only help with DSA-related questions. Please ask me about topics like arrays, trees, graphs, dynamic programming, sorting algorithms, time/space complexity, coding interviews, or any DSA problem-solving techniques!"
+3. Be concise, educational, and practical
+4. Provide code examples when relevant
+5. Explain time and space complexity
+6. Help users understand concepts, not just memorize
+7. Encourage problem-solving skills
+
+User message: ${message}`;
+
+    if (!isDSARelated) {
+      return res.json({
+        reply: "I'm DSA Genie, specialized only in Data Structures and Algorithms. I can only help with DSA-related questions. Please ask me about topics like arrays, trees, graphs, dynamic programming, sorting algorithms, time/space complexity, coding interviews, or any DSA problem-solving techniques!"
+      });
+    }
+
+    const aiResponse = await geminiChat(systemPrompt);
+    
+    // Post-check: If response seems off-topic, remind user
+    const response = aiResponse.trim();
+    
+    res.json({ reply: response });
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({ error: 'Failed to process message' });
@@ -113,10 +234,11 @@ router.post('/explanation', auth, async (req, res) => {
 // @access  Private
 router.post('/learning-path', auth, async (req, res) => {
   try {
-    const { targetTopics, difficulty, duration } = req.body;
+    const { targetTopics = [], difficulty = 'mixed', duration = 4 } = req.body;
     const user = await User.findById(req.user._id)
       .populate('solvedProblems.problemId', 'title difficulty topics');
-    const prompt = `Create a personalized learning path for a user with level ${user.level}, solved problems: ${user.stats.totalSolved}, target topics: ${targetTopics.join(', ')}, target difficulty: ${difficulty}, duration: ${duration} weeks.`;
+    const normalizedTopics = Array.isArray(targetTopics) ? targetTopics : [targetTopics].filter(Boolean);
+    const prompt = `Create a personalized learning path for a user with level ${user.level}, solved problems: ${user.stats.totalSolved}, target topics: ${normalizedTopics.join(', ') || 'general dsa'}, target difficulty: ${difficulty}, duration: ${duration} weeks.`;
     const learningPath = await geminiChat(prompt);
     res.json({ learningPath, userProgress: user.getProgress() });
   } catch (error) {
@@ -184,23 +306,22 @@ Return the response as a valid JSON object with this structure:
   "solutionTemplate": {"javascript": "code", "python": "code", "java": "code", "cpp": "code"}
 }`;
 
-    const response = await geminiChat(prompt);
-    
-    // Try to extract JSON from the response
-    let cleanedResponse = response.trim();
-    cleanedResponse = cleanedResponse.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      cleanedResponse = jsonMatch[0];
-    }
-    
     let problemData;
     try {
+      const response = await geminiChat(prompt);
+      
+      // Try to extract JSON from the response
+      let cleanedResponse = response.trim();
+      cleanedResponse = cleanedResponse.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanedResponse = jsonMatch[0];
+      }
+      
       problemData = JSON.parse(cleanedResponse);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Raw response:', response);
-      throw new Error(`Invalid JSON response: ${parseError.message}`);
+    } catch (aiError) {
+      console.error('AI generation failed, using fallback problem generator:', aiError.message);
+      problemData = buildFallbackProblem(topic, difficulty, description);
     }
     
     // Validate required fields

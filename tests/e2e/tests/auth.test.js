@@ -78,7 +78,7 @@ describe('DSA Genie - User Authentication Tests', function() {
   });
 
   it('should login with registered user', async function() {
-    await driver.login(testUser.username, testUser.password);
+    await driver.login(testUser.email, testUser.password);
 
     // Verify login success
     const dashboard = await driver.waitForElement(By.css('.dashboard'));
@@ -105,7 +105,7 @@ describe('DSA Genie - User Authentication Tests', function() {
   it('should prevent login with invalid credentials', async function() {
     await driver.navigateTo('/login');
 
-    await driver.typeText(By.id('username'), 'invaliduser');
+    await driver.typeText(By.id('email'), 'invaliduser@example.com');
     await driver.typeText(By.id('password'), 'wrongpassword');
     await driver.clickElement(By.css('button[type="submit"]'));
 

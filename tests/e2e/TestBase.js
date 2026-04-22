@@ -81,9 +81,9 @@ class TestBase {
     return filepath;
   }
 
-  async login(username, password) {
+  async login(email, password) {
     await this.navigateTo('/login');
-    await this.typeText(By.id('username'), username);
+    await this.typeText(By.id('email'), email);
     await this.typeText(By.id('password'), password);
     await this.clickElement(By.css('button[type="submit"]'));
     await this.waitForElement(By.css('.dashboard'), 15000);

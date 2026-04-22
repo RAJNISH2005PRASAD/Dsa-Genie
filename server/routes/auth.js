@@ -77,7 +77,10 @@ router.post('/register', [
         role: user.role,
         coins: user.coins,
         level: user.level,
-        streak: user.streak
+        experience: user.experience,
+        streak: user.streak,
+        stats: user.stats,
+        preferences: user.preferences
       }
     });
   } catch (error) {
@@ -140,7 +143,9 @@ router.post('/login', [
         role: user.role,
         coins: user.coins,
         level: user.level,
+        experience: user.experience,
         streak: user.streak,
+        stats: user.stats,
         preferences: user.preferences
       }
     });

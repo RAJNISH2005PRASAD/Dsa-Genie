@@ -1,12 +1,15 @@
 const OpenAI = require('openai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
 async function geminiChat(prompt, maxRetries = 3) {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY is not configured. Please set it in your .env file.');
+  }
+  if (!openai) {
+    throw new Error('OpenAI client is not initialized.');
   }
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {

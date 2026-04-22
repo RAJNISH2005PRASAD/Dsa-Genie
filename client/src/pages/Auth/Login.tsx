@@ -26,7 +26,12 @@ const Login: React.FC = () => {
       login(res.data);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      const data = err.response?.data;
+      if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        setError(data.errors.map((e: { msg?: string }) => e.msg || '').join('. '));
+      } else {
+        setError(data?.error || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -47,9 +52,9 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="login-form mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-error-900/20 border border-error-500/30 text-error-400 px-4 py-3 rounded-lg">
+            <div className="error-message bg-error-900/20 border border-error-500/30 text-error-400 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}

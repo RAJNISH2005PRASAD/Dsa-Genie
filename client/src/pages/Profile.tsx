@@ -47,8 +47,30 @@ const Profile: React.FC = () => {
       setLoading(true);
       try {
         const res = await api.get('/auth/me');
-        setStats(res.data.user);
-        updateUser(res.data.user);
+        const u = res.data.user;
+        updateUser(u);
+        setStats({
+          totalSolved: u.stats?.totalSolved ?? 0,
+          easySolved: u.stats?.easySolved ?? 0,
+          mediumSolved: u.stats?.mediumSolved ?? 0,
+          hardSolved: u.stats?.hardSolved ?? 0,
+          streak: u.streak ?? { current: 0, longest: 0 },
+          level: u.level ?? 1,
+          experience: u.experience ?? 0,
+          coins: u.coins ?? 0,
+          achievements: (u.achievements || []).map((a: any, i: number) => ({
+            id: a._id || String(i),
+            name: typeof a === 'string' ? a : (a.name || a.type || 'Achievement'),
+            description: a.description || '',
+            icon: a.icon || '🏆',
+            unlockedAt: a.earnedAt || new Date().toISOString()
+          })),
+          recentActivity: (u.recentActivity || []).map((a: any) => ({
+            type: a.type || '',
+            description: a.description || '',
+            timestamp: a.timestamp || new Date().toISOString()
+          }))
+        });
       } catch (err) {
         console.error('Failed to fetch profile');
       } finally {

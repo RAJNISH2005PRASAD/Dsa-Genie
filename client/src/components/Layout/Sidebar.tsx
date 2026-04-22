@@ -46,12 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-dark-800 border-r border-dark-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 glass-panel border-r border-dark-700/60 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-dark-700">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-dark-700/60">
             <Link to="/" className="flex items-center">
               <SparklesIcon className="h-8 w-8 text-primary-500" />
               <span className="ml-2 text-xl font-bold gradient-text">DSA Genie</span>
@@ -75,10 +75,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                   key={item.name}
                   to={item.href}
                   className={`
-                    group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                    group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200
                     ${isActive 
-                      ? 'bg-primary-600 text-white' 
-                      : 'text-dark-300 hover:bg-dark-700 hover:text-white'
+                      ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-glow' 
+                      : 'text-dark-300 hover:bg-dark-700/80 hover:text-white'
                     }
                   `}
                   onClick={onClose}
@@ -92,15 +92,15 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
           {/* User Profile */}
           {user && (
-            <div className="border-t border-dark-700 p-4">
+            <div className="border-t border-dark-700/60 p-4">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
                   <span className="text-white font-semibold">
                     {user.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="user-info text-sm font-medium text-white truncate">
                     {user.username}
                   </p>
                   <p className="text-xs text-dark-400">
@@ -137,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                 </Link>
                 <button
                   onClick={logout}
-                  className="flex items-center w-full px-3 py-2 text-sm text-danger-400 hover:text-danger-300 hover:bg-dark-700 rounded-lg transition-colors duration-200"
+                  className="logout-btn flex items-center w-full px-3 py-2 text-sm text-danger-400 hover:text-danger-300 hover:bg-dark-700 rounded-lg transition-colors duration-200"
                 >
                   <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4" />
                   Logout
