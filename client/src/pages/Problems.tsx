@@ -60,9 +60,9 @@ const Problems: React.FC = () => {
   }
 
   return (
-    <div className="problems-list space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold gradient-text">Problems</h1>
+        <h1 className="text-2xl font-bold text-white">Problems</h1>
         <div className="flex space-x-4">
           <select
             value={filters.difficulty}
@@ -85,10 +85,10 @@ const Problems: React.FC = () => {
         </div>
       </div>
 
-      <div className="card-hover">
+      <div className="card">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-dark-700">
-            <thead className="bg-dark-700/70">
+            <thead className="bg-dark-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-300 uppercase tracking-wider">
                   Status
@@ -107,9 +107,9 @@ const Problems: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-dark-800/40 divide-y divide-dark-700/70">
+            <tbody className="bg-dark-800 divide-y divide-dark-700">
               {problems.map((problem) => (
-                <tr key={problem._id} className="hover:bg-dark-700/70 transition-colors duration-200">
+                <tr key={problem._id} className="hover:bg-dark-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="w-4 h-4 rounded-full bg-dark-600"></div>
                   </td>
